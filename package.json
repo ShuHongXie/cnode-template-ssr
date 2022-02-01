@@ -1,0 +1,11 @@
+{
+  "name": "new-vue-ssr",
+  "version": "1.0.0",
+  "description": "cnode社区ssr方案例子",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
