@@ -1,7 +1,8 @@
 const path = require("path");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const { VueLoaderPlugin } = require("vue-loader");
 
 module.exports = {
+  mode: "development",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "../src"),
@@ -18,6 +19,18 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: "vue-loader",
+        options: {
+          prettify: false,
+        },
+      },
+      {
+        test: /\.png/,
+        type: "asset",
+        generator: {
+          //与output.assetModuleFilename是相同的,这个写法引入的时候也会添加好这个路径
+          //打包后对资源的引入，文件命名已经有/img了
+          publicPath: "./",
+        },
       },
       {
         test: /\.js$/,
@@ -30,36 +43,7 @@ module.exports = {
         exclude: (file) =>
           /node_modules/.test(file) && !/(\.vue|\.js)/.test(file),
       },
-      {
-        test: /\.css$/,
-        use: [
-          // [style-loader](/loaders/style-loader)
-          // MiniCssExtractPlugin.loader,
-          // { loader: "style-loader" },
-          // [css-loader](/loaders/css-loader)
-          {
-            loader: "css-loader",
-            options: {
-              modules: true,
-            },
-          },
-          "postcss-loader",
-        ],
-      },
-      {
-        test: /\.less$/,
-        use: [
-          // MiniCssExtractPlugin.loader,
-          "vue-style-loader",
-          // "style-loader",
-          "css-loader",
-          "less-loader",
-          // {
-          //   loader: "postcss-loader",
-          // },
-        ],
-      },
     ],
   },
-  plugins: [],
+  plugins: [new VueLoaderPlugin()],
 };

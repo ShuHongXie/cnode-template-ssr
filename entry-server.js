@@ -6,7 +6,6 @@ export default (context) => {
   // 就已经准备就绪。
   return new Promise((resolve, reject) => {
     const { app, router, store } = createApp();
-    console.log(store, context);
     // 设置服务器端 router 的位置
     router.push(context.url);
 
@@ -20,15 +19,29 @@ export default (context) => {
       // 对所有匹配的路由组件调用 `asyncData()`
       Promise.all(
         matchedComponents.map((Component) => {
+          console.log(Component);
           if (Component.asyncData) {
-            return Component.asyncData({
+            // return 出来的变量同时也注入组件
+            const componentData =
+              Component.data ||
+              function () {
+                return {};
+              };
+            const data = componentData.call(this);
+            const asyncData = Component.asyncData({
               store,
               route: router.currentRoute,
             });
+            Component.data = function () {
+              return { ...data, ...asyncData };
+            };
+            console.log(JSON.stringify(Component));
+            return asyncData;
           }
         })
       )
         .then(() => {
+          // console.log(store.state);
           // 在所有预取钩子(preFetch hook) resolve 后，
           // 我们的 store 现在已经填充入渲染应用程序所需的状态。
           // 当我们将状态附加到上下文，

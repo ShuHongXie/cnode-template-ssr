@@ -1,8 +1,7 @@
 <template>
   <div>
-    <!-- <nv-head ref="head" :title="pageTitle"></nv-head> -->
-    测试页面
-    <!-- <section class="topic">
+    <nv-head ref="head" :title="pageTitle"></nv-head>
+    <section class="topic">
       <ul class="topic-list">
         <li v-for="(item, index) of topics" :key="index">
           <router-link
@@ -45,11 +44,12 @@
       </div>
     </div>
     <nv-top></nv-top>
-    <nv-load :show="showLoad"></nv-load> -->
+    <nv-load :show="showLoad"></nv-load>
   </div>
 </template>
 
 <style lang="less" scoped>
+@import "../styles/topic";
 .loading {
   width: 120px;
   /*height: 120px;*/
@@ -85,46 +85,50 @@
 </style>
 
 <script>
-// import { mapState } from "vuex";
-// import "../styles/topic";
-// import nvHead from "../components/header";
-// import nvTop from "../components/backTop";
-// import nvLoad from "../components/loading";
-// import { GET_TOPIC_LIST, UPDATE_TOPIC_LIST } from "../constants/mutationTypes";
-// import { topicTab } from "../constants/topicInfo";
-// import { getTimeInfo } from "../utils/index";
-
+import { mapState } from "vuex";
+import nvHead from "@/components/header";
+import nvTop from "@/components/backTop";
+import nvLoad from "@/components/loading";
+import { GET_TOPIC_LIST, UPDATE_TOPIC_LIST } from "@/constants/mutationTypes";
+import { topicTab } from "@/constants/topicInfo";
+import { getTimeInfo } from "@/utils/index";
 export default {
   data() {
     return {
-      searchOption: {
-        page: 1,
-        limit: 20,
-        tab: "all",
-        mdrender: false,
-      },
       scrollDelay: false,
     };
   },
+  asyncData({ store, route }) {
+    const searchOption = {
+      page: 1,
+      limit: 20,
+      tab: "all",
+      mdrender: false,
+    };
+    store.dispatch(GET_TOPIC_LIST, searchOption);
+    return {
+      searchOption,
+    };
+  },
+  mounted() {
+    console.log(window, this);
+    if (this.$route.query && this.$route.query.tab) {
+      this.searchOption.tab = this.$route.query.tab;
+    }
+    if (
+      sessionStorage.getItem("tab") &&
+      sessionStorage.getItem("tab") === (this.$route.query.tab || "all")
+    ) {
+      this.searchOption = JSON.parse(sessionStorage.getItem("searchOption"));
+    } else {
+      this.getTopics();
+    }
+    document.addEventListener("scroll", this.getScrollData, false);
+  },
 
-  // mounted() {
-  //   if (this.$route.query && this.$route.query.tab) {
-  //     this.searchOption.tab = this.$route.query.tab;
-  //   }
-  //   if (
-  //     sessionStorage.getItem("tab") &&
-  //     sessionStorage.getItem("tab") === (this.$route.query.tab || "all")
-  //   ) {
-  //     this.searchOption = JSON.parse(sessionStorage.getItem("searchOption"));
-  //   } else {
-  //     this.getTopics();
-  //   }
-  //   document.addEventListener("scroll", this.getScrollData, false);
-  // },
-
-  // beforeDestroy() {
-  //   document.removeEventListener("scroll", this.getScrollData);
-  // },
+  beforeDestroy() {
+    document.removeEventListener("scroll", this.getScrollData);
+  },
 
   // beforeRouteEnter(to, from, next) {
   //   if (
@@ -153,70 +157,71 @@ export default {
   //   next();
   // },
 
-  // methods: {
-  //   getTopics() {
-  //     this.$store.dispatch(GET_TOPIC_LIST, this.searchOption);
-  //   },
+  methods: {
+    getTopics() {
+      this.$store.dispatch(GET_TOPIC_LIST, this.searchOption);
+    },
 
-  //   getTabInfo(item) {
-  //     let tab = item.tab;
-  //     if (item.good) {
-  //       tab = "good";
-  //     } else if (item.top) {
-  //       tab = "top";
-  //     }
-  //     return topicTab[tab];
-  //   },
+    getTabInfo(item) {
+      let tab = item.tab;
+      if (item.good) {
+        tab = "good";
+      } else if (item.top) {
+        tab = "top";
+      }
+      return topicTab[tab];
+    },
 
-  //   getScrollData() {
-  //     const y = document.body.scrollTop || document.documentElement.scrollTop;
-  //     const documentH = document.documentElement.clientHeight;
-  //     const dom = document.querySelectorAll(".topic-list li");
-  //     if (
-  //       dom.length &&
-  //       dom[dom.length - 1].offsetTop + dom[dom.length - 1].offsetHeight <=
-  //         y + documentH &&
-  //       !this.scrollDelay
-  //     ) {
-  //       this.searchOption.page = this.searchOption.page + 1;
-  //       this.scrollDelay = true;
-  //       this.$store.dispatch(UPDATE_TOPIC_LIST, this.searchOption).then(() => {
-  //         this.scrollDelay = false;
-  //       });
-  //     }
-  //   },
-  // },
+    getScrollData() {
+      const y = document.body.scrollTop || document.documentElement.scrollTop;
+      const documentH = document.documentElement.clientHeight;
+      const dom = document.querySelectorAll(".topic-list li");
+      if (
+        dom.length &&
+        dom[dom.length - 1].offsetTop + dom[dom.length - 1].offsetHeight <=
+          y + documentH &&
+        !this.scrollDelay
+      ) {
+        this.searchOption.page = this.searchOption.page + 1;
+        this.scrollDelay = true;
+        this.$store.dispatch(UPDATE_TOPIC_LIST, this.searchOption).then(() => {
+          this.scrollDelay = false;
+        });
+      }
+    },
+  },
 
-  // filters: {
-  //   getTimeInfo(str) {
-  //     return getTimeInfo(str);
-  //   },
-  // },
+  filters: {
+    getTimeInfo(str) {
+      return getTimeInfo(str);
+    },
+  },
 
-  // computed: {
-  //   ...mapState(["topics", "showLoad", "showListLoad"]),
-  //   pageTitle() {
-  //     const tab = (this.$route.query && this.$route.query.tab) || "all";
-  //     return topicTab[tab];
-  //   },
-  // },
+  computed: {
+    ...mapState(["topics", "showLoad", "showListLoad"]),
+    pageTitle() {
+      const tab = (this.$route.query && this.$route.query.tab) || "all";
+      return topicTab[tab];
+    },
+  },
 
-  // watch: {
-  //   $route(to) {
-  //     if (to.query && to.query.tab) {
-  //       this.searchOption.tab = to.query.tab;
-  //     }
-  //     this.searchOption.page = 1;
-  //     this.getTopics();
-  //     // 隐藏导航栏
-  //     this.$refs.head.show = false;
-  //   },
-  // },
+  watch: {
+    $route(to) {
+      console.log(to, this.searchOptio);
+      if (to.query && to.query.tab) {
+        this.searchOption.tab = to.query.tab;
+      }
+      this.searchOption.page = 1;
+      this.getTopics();
+      // 隐藏导航栏
+      this.$refs.head.show = false;
+    },
+  },
 
-  // components: {
-  //   nvHead,
-  //   nvTop,
-  //   nvLoad,
-  // },
+  components: {
+    nvHead,
+    nvTop,
+    nvLoad,
+  },
 };
 </script>

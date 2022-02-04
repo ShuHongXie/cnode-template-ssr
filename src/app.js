@@ -5,9 +5,9 @@ import { createStore } from "@/vuex/index.js";
 import { sync } from "vuex-router-sync";
 import App from "./app.vue";
 
-// import "./styles/main.less";
+import "./styles/main.less";
 // import "github-markdown-css"; //markdown css
-// import "./styles/iconfont/iconfont.css";
+import "./styles/iconfont/iconfont.css";
 
 // 注册一个全局自定义指令 v-focus
 // window &&
@@ -28,7 +28,6 @@ import App from "./app.vue";
 export function createApp() {
   const router = createRouter();
   const store = createStore();
-  console.log(router, store);
   // 同步路由状态(route state)到 store
   sync(store, router);
   const app = new Vue({

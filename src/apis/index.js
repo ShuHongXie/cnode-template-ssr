@@ -1,4 +1,4 @@
-require("isomorphic-fetch");
+import axios from "axios";
 
 const baseOpts = {
   method: "get",
@@ -23,7 +23,7 @@ const fetchApi = (cfg) => {
   const url = opts.url;
   delete opts.url;
 
-  let fetchUrl = "/api";
+  let fetchUrl = "https://cnodejs.org/api";
   if (/^\//.test(url)) {
     fetchUrl += url;
   } else {
@@ -55,18 +55,13 @@ const fetchApi = (cfg) => {
   // fetchUrl = 'https://cnodejs.org' + fetchUrl;
 
   return new Promise((resolve, reject) => {
-    fetch(fetchUrl, opts)
+    axios({
+      ...opts,
+      url: fetchUrl,
+    })
       .then((res) => {
-        const isSuccess = res.ok || (res.status >= 200 && res.status < 300);
-        if (isSuccess) {
-          const data =
-            res.headers.get("content-type") &&
-            res.headers.get("content-type").indexOf("json") >= 0
-              ? res.json()
-              : res.text();
-          resolve(data);
-        } else {
-          throw res;
+        if (res.data.success) {
+          resolve(res.data);
         }
       })
       .catch((err) => {

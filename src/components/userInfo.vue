@@ -48,7 +48,7 @@
 
 <script>
 import { mapState } from "vuex";
-import { LOGIN_OUT } from "../constants/mutationTypes";
+import { LOGIN_OUT } from "@/constants/mutationTypes";
 
 export default {
   methods: {

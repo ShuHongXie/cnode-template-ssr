@@ -15,12 +15,8 @@
   </div>
 </template>
 
-<style></style>
-
 <script>
-import "../styles/header";
 import nvMenu from "./menu";
-
 export default {
   data() {
     return {
@@ -46,3 +42,7 @@ export default {
   },
 };
 </script>
+
+<style lang="less" scoped>
+@import "../styles/header.less";
+</style>

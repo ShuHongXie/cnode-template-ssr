@@ -46,7 +46,8 @@
   </nav>
 </template>
 
-<style lang="less">
+<style lang="less" scoped>
+@import "../styles/menu";
 .message-count {
   position: absolute;
   color: red;
@@ -57,9 +58,9 @@
 
 <script>
 import { mapState } from "vuex";
-import "../styles/menu.less";
+
 import UserInfo from "./userInfo";
-import { messageCount } from "../apis/publicApi";
+import { messageCount } from "@/apis/publicApi";
 export default {
   data() {
     return {
